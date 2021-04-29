@@ -3,7 +3,7 @@ import moviepy.editor as mp
 from settings import AK
 
 
-def ytdl(vn=''):
+def ytdl(vn):
     ydl = youtube_dl.YoutubeDL({'outtmpl': 'tmp/%(id)s.%(ext)s', 'format': 'bestvideo, bestaudio'})
     ydl.extract_info(f'https://www.youtube.com/watch?v={vn}', download=True)
 
@@ -47,4 +47,5 @@ def get_time_comment(lst):
     return times, comments
 
 
-res1, res2 = get_time_comment(get_comment(f'{id}'))
+vid = "PyI1Y2vW1_Q"
+res1, res2 = get_time_comment(get_comment(f'{vid}'))

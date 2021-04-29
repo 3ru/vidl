@@ -2,9 +2,7 @@
 Download high quality Youtube videos and split them
 # Installation
 ```bash
-$ pip instlal youtube_dl
-$ pip instlal moviepy
-$ pip instlal python-dotenv
+$ pip install youtube_dl moviepy python-dotenv ffmpeg-python
 ```
 
 > Status: <Under developing> 🔨 
