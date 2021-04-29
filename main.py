@@ -1,16 +1,17 @@
-import re, requests, json, shutil, youtube_dl
+import os, re, requests, ffmpeg, shutil, youtube_dl
 import moviepy.editor as mp
 from settings import AK
 
 
-def ytdl(vn):
+def dl(vn):
+    os.makedirs("DL", exist_ok=True)
     ydl = youtube_dl.YoutubeDL({'outtmpl': 'tmp/%(id)s.%(ext)s', 'format': 'bestvideo, bestaudio'})
     ydl.extract_info(f'https://www.youtube.com/watch?v={vn}', download=True)
 
     # TODO 拡張子の動的取得
     video = mp.VideoFileClip(f'tmp/{vn}.mp4')
     video = video.set_audio(mp.AudioFileClip(f'tmp/{vn}.m4a'))
-    video.write_videofile(f'vid/{vn}.mp4')
+    video.write_videofile(f'DL/{vn}.mp4')
 
     shutil.rmtree('tmp/')
 
@@ -47,5 +48,33 @@ def get_time_comment(lst):
     return times, comments
 
 
+def splitter(vn, time_list, comment_list):
+    secs = []
+    os.makedirs(vn, exist_ok=True)
+
+    for i in time_list:
+        if len(t := i.split(':')) > 2:
+            secs.append((int(t[0]) * 60 + int(t[1])) * 60 + int(t[2]))
+        elif len(t := i.split(':')) == 2:
+            secs.append(int(t[0]) * 60 + int(t[1]))
+
+    stream = ffmpeg.input(f'DL/{vn}.mp4')
+    for i, s in enumerate(secs):
+        trim = ffmpeg.output(stream, f'{vn}/{comment_list[i][:10]}.mp4', ss=s, t=secs[i + 1] - s)
+        thumb = ffmpeg.filter(stream, 'select', f'gte(n,{30 * (s + 1)})').output(f'{vn}/{comment_list[i][:10]}.jpg',
+                                                                                 vframes=1, format='image2',
+                                                                                 vcodec='mjpeg')
+        ffmpeg.run(trim)
+        ffmpeg.run(thumb)
+        if i == len(secs) - 2:
+            break
+    os.rename(vn, "[済]-" + vn)
+
+    return None
+
+
 vid = "PyI1Y2vW1_Q"
-res1, res2 = get_time_comment(get_comment(f'{vid}'))
+# dl(vid)
+
+times, comments = get_time_comment(get_comment(vid))
+splitter('PyI1Y2vW1_Q', times, comments)
