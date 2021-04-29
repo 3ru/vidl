@@ -3,3 +3,5 @@
 *.mp4
 *.webm
 *.m4a
+
+.env
