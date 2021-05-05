@@ -1,0 +1,7 @@
+requests~=2.25.1
+moviepy~=1.0.3
+python-dotenv~=0.17.0
+youtube_dl
+ffmpeg-python
+google-cloud-speech
+google-cloud-storage

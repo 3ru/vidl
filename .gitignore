@@ -1,9 +1,12 @@
 .idea
+DL/
+tmp/
+
 
 *.mp4
 *.webm
 *.m4a
 
-.env
+src/.env
 
 __pycache__
