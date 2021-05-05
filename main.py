@@ -1,16 +1,18 @@
-import os, re, requests, ffmpeg, shutil, youtube_dl
+import os, re, requests, ffmpeg, shutil, youtube_dl, glob
 import moviepy.editor as mp
-from settings import AK
+from settings import *
 
 
 def dl(vn):
+    vl = []
     os.makedirs("DL", exist_ok=True)
-    ydl = youtube_dl.YoutubeDL({'outtmpl': 'tmp/%(id)s.%(ext)s', 'format': 'bestvideo, bestaudio'})
-    ydl.extract_info(f'https://www.youtube.com/watch?v={vn}', download=True)
+    for i in ["video", "audio"]:
+        ydl = youtube_dl.YoutubeDL({'outtmpl': f'tmp/%(id)s_{i}.%(ext)s', 'format': f'best{i}'})
+        ydl.extract_info(f'https://www.youtube.com/watch?v={vn}', download=True)
+        vl += glob.glob(f'tmp/{vn}_{i}*')
 
-    # TODO 拡張子の動的取得
-    video = mp.VideoFileClip(f'tmp/{vn}.mp4')
-    video = video.set_audio(mp.AudioFileClip(f'tmp/{vn}.m4a'))
+    video = mp.VideoFileClip(vl[0])
+    video = video.set_audio(mp.AudioFileClip(vl[1]))
     video.write_videofile(f'DL/{vn}.mp4')
 
     shutil.rmtree('tmp/')
@@ -73,8 +75,9 @@ def splitter(vn, time_list, comment_list):
     return None
 
 
-vid = "PyI1Y2vW1_Q"
-# dl(vid)
+# vid = "PyI1Y2vW1_Q"
+vid = "8IHWMapTnfw"
 
-times, comments = get_time_comment(get_comment(vid))
-splitter('PyI1Y2vW1_Q', times, comments)
+dl(vid)
+# times, comments = get_time_comment(get_comment(vid))
+# splitter(vid, times, comments)
