@@ -1,5 +1,8 @@
 .idea
+*.json
+
 DL/
+FIN/
 tmp/
 
 
