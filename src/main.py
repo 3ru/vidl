@@ -76,11 +76,11 @@ def _init():
     except Exception as e: return print(f'動画DLにてエラーが発生しました\n{e}')
 
     try: times, comments = get_time_comment(get_comment(vn))
-    except Exception as e: return print(f'YouTubeコメント取得してエラーが発生しました\n{e}')
+    except Exception as e: return print(f'コメント取得にてエラーが発生しました\n{e}')
 
     try: splitter(vn, times, comments)
     except Exception as e: return print(f'動画分割にてエラーが発生しました\n{e}')
-    print("\n処理が完了しました")
+    print("\n処理完了")
 
 
 if __name__ == '__main__':
