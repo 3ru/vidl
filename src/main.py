@@ -28,20 +28,19 @@ def get_comment(video_id, n=30):
     resource = requests.get(URL + 'commentThreads', params=params).json()
     for comment_info in resource['items']:
         text = comment_info['snippet']['topLevelComment']['snippet']['textDisplay']
-        if len(re.findall(r'\d+:\d+', text)) > 10: return text.replace('\r', '').split("\n")
+        if len(re.findall(r'\d+:\d+', text)) >= 8: return text.replace('\r', '').split("\n")
 
-    return None
+    raise Exception("コメント欄にタイムラインが見つかりませんでした")
 
 
 def get_time_comment(lst):
     times, comments = [], []
-    if lst is not None:
-        for i in lst:
-            if time := re.findall(r'\d+.*:\d+', i):
-                n = re.search(r'\d+.*:\d+', i).end()
-                times.append(*time)
-                comments.append(i[n:].replace(' ', ''))
-                print(*time, i[n:].replace(' ', ''))
+    for i in lst:
+        if time := re.findall(r'\d+.*:\d+', i):
+            n = re.search(r'\d+.*:\d+', i).end()
+            times.append(*time)
+            comments.append(i[n:].replace(' ', ''))
+            print(*time, i[n:].replace(' ', ''))
     return times, comments
 
 
@@ -54,9 +53,10 @@ def splitter(vn, time_list, comment_list):
         elif len(t := i.split(':')) == 2: secs.append(int(t[0]) * 60 + int(t[1]))
 
     for i, s in enumerate(secs):
-        trim = ffmpeg.output(stream, f'../FIN/{vn}/{comment_list[i][:10]}.mp4', ss=s, t=secs[i + 1] - s)
+        file_name = str(comment_list[i][:10]).replace('/', '')
+        trim = ffmpeg.output(stream, f'../FIN/{vn}/{file_name}.mp4', ss=s, t=secs[i + 1] - s)
         thumb = ffmpeg.filter(stream, 'select', f'gte(n,{30 * (s + 1)})').output(
-            f'../FIN/{vn}/{comment_list[i][:10]}_thumbnail.jpg',
+            f'../FIN/{vn}/{file_name}_thumbnail.jpg',
             vframes=1, format='image2',
             vcodec='mjpeg')
         ffmpeg.run(trim)
